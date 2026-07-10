@@ -94,7 +94,7 @@ class Moderation(commands.Cog):
         await member.ban(reason=reason)
         await ctx.send(f"🔨 {member.mention} was banned.")
 
-      # =======================
+    # =======================
     # TIMEOUT
     # =======================
 
@@ -263,6 +263,69 @@ class Moderation(commands.Cog):
         try:
             await ctx.message.delete()
         except Exception:
+            pass
+
+    # =======================
+    # PURGE
+    # =======================
+
+    @app_commands.command(name="purge", description="Purge a specified number of messages")
+    @app_commands.describe(amount="The number of messages to delete")
+    async def slash_purge(
+        self,
+        interaction: discord.Interaction,
+        amount: int
+    ):
+        if not self.allowed(interaction.user):
+            return await interaction.response.send_message(
+                "❌ You don't have permission.",
+                ephemeral=True
+            )
+
+        if amount <= 0:
+            return await interaction.response.send_message(
+                "❌ Please specify a number greater than 0.",
+                ephemeral=True
+            )
+
+        if amount > 100:
+            amount = 100
+
+        await interaction.response.defer(ephemeral=True)
+        
+        deleted = await interaction.channel.purge(limit=amount)
+        
+        await interaction.followup.send(
+            f"🧹 Successfully purged **{len(deleted)}** messages.",
+            ephemeral=True
+        )
+
+    @commands.command(name="purge")
+    async def purge(
+        self,
+        ctx,
+        amount: int
+    ):
+        if not self.allowed(ctx.author):
+            return await ctx.send("❌ You don't have permission.")
+
+        if amount <= 0:
+            return await ctx.send("❌ Please specify a number greater than 0.")
+
+        if amount > 100:
+            amount = 100
+
+        try:
+            await ctx.message.delete()
+        except discord.HTTPException:
+            pass
+
+        deleted = await ctx.channel.purge(limit=amount)
+
+        status_msg = await ctx.send(f"🧹 Successfully purged **{len(deleted)}** messages.")
+        try:
+            await status_msg.delete(delay=5)
+        except discord.HTTPException:
             pass
 
 
