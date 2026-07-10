@@ -7,6 +7,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 
+
 class MyBot(discord.Client):
     def __init__(self):
         super().__init__(intents=intents)
@@ -14,6 +15,7 @@ class MyBot(discord.Client):
 
     async def setup_hook(self):
         await self.tree.sync()
+
 
 bot = MyBot()
 
@@ -23,25 +25,47 @@ async def on_ready():
     print(f"Logged in as {bot.user}")
 
 
-# Slash command
-@bot.tree.command(name="ping", description="Check if the bot is online")
-async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message("Pong!")
+# Slash /say command
+@bot.tree.command(name="say", description="Send a message to a channel")
+@app_commands.describe(
+    message="The message to send",
+    channel="The channel to send the message in",
+    embed="Send as an embed?"
+)
+async def say(
+    interaction: discord.Interaction,
+    message: str,
+    channel: discord.TextChannel,
+    embed: bool
+):
+    if embed:
+        embed_message = discord.Embed(
+            description=message,
+            color=discord.Color.blue()
+        )
+        await channel.send(embed=embed_message)
+    else:
+        await channel.send(message)
+
+    await interaction.response.send_message(
+        "✅ Message sent!",
+        ephemeral=True
+    )
 
 
-# Prefix command system
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.content == "-ping":
-        await message.channel.send("Pong!")
+    if message.content.startswith("-say "):
+        text = message.content[5:]
 
-    if message.content == "-hello":
-        await message.channel.send(
-            f"Hello {message.author.mention}!"
-        )
+        # Delete the command message
+        await message.delete()
+
+        # Send the actual message
+        await message.channel.send(text)
 
 
 bot.run(TOKEN)
