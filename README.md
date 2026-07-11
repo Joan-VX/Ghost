@@ -12,7 +12,7 @@ A Discord bot built with **discord.py 2.x** featuring moderation tools, ticket s
 - `/clear` & `-clear`
 - `/say` & `-say`
 
-### 🎫 Ticket System *(Work in Progress)*
+### 🎫 Ticket System
 - Support panel
 - Open Ticket button
 - Inquiry modal
