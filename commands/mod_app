@@ -5,7 +5,6 @@ import asyncio
 
 # ==========================================
 # CONFIGURATION
-# Replace these IDs with your actual server IDs
 # ==========================================
 TOKEN = "YOUR_BOT_TOKEN_HERE"
 LOG_CHANNEL_ID = 987654321098765432  # Private channel where staff reviews apps
