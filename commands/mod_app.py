@@ -6,7 +6,7 @@ import asyncio
 # ==========================================
 # CONFIGURATION
 # ==========================================
-TOKEN = "YOUR_BOT_TOKEN_HERE"
+TOKEN = "MTUyNTE5MzA1NjU1MzI3NTQ2Mg.GKIkJ_.vH6PbxIcnuxWMf0V3vlqFnCVFdhQ53LQNDtCsg"
 LOG_CHANNEL_ID = 987654321098765432  # Private channel where staff reviews apps
 
 
