@@ -407,18 +407,14 @@ class Tickets(commands.Cog):
 
         if not isinstance(member, discord.Member):
             await interaction.response.send_message(
-                "Unable to verify permissions.",
-                ephemeral=True,
-            )
-            return
-
         if not is_staff(member):
             await interaction.response.send_message(
                 "Only staff can close tickets.",
                 ephemeral=True,
             )
             return
-         await self.log_ticket_close(channel, member)
+
+        await self.log_ticket_close(channel, member)
 
         await asyncio.sleep(2)
 
