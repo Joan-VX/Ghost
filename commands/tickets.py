@@ -418,7 +418,6 @@ class Tickets(commands.Cog):
                 ephemeral=True,
             )
             return
-
          await self.log_ticket_close(channel, member)
 
         await asyncio.sleep(2)
