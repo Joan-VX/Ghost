@@ -407,13 +407,17 @@ class Tickets(commands.Cog):
 
         if not isinstance(member, discord.Member):
             await interaction.response.send_message(
+                "Unable to verify permissions.",
+                ephemeral=True,
+            )
+            return
+
         if not is_staff(member):
             await interaction.response.send_message(
                 "Only staff can close tickets.",
                 ephemeral=True,
             )
             return
-
         await self.log_ticket_close(channel, member)
 
         await asyncio.sleep(2)
@@ -430,12 +434,10 @@ class Tickets(commands.Cog):
         if match:
             return int(match.group(1))
 
-        return None
-            if not isinstance(member, discord.Member) or not is_staff(member):
-                await ctx_or_interaction.send(
-                    "You do not have permission to use this command."
-                )
-                return False
+           async def ensure_staff(
+        self,
+        ctx_or_interaction,
+    ) -> bool:
 
             return True
 
