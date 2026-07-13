@@ -87,13 +87,15 @@ class TicketControls(discord.ui.View):
         custom_id="tickets:close",
         emoji="🔒",
     )
-    async def close_ticket(
-        self,
-        interaction: discord.Interaction,
-        button: discord.ui.Button,
-    ):
-        await self.cog.close_ticket(interaction)
-      class Tickets(commands.Cog):
+async def close_ticket(
+    self,
+    interaction: discord.Interaction,
+    button: discord.ui.Button,
+):
+    await self.cog.close_ticket(interaction)
+
+
+class Tickets(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
