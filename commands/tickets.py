@@ -74,7 +74,6 @@ class OpenTicketView(discord.ui.View):
     ):
         await interaction.response.send_modal(InquiryModal(self.cog))
 
-
 class TicketControls(discord.ui.View):
 
     def __init__(self, cog: "Tickets"):
@@ -87,17 +86,18 @@ class TicketControls(discord.ui.View):
         custom_id="tickets:close",
         emoji="🔒",
     )
-async def close_ticket(
-    self,
-    interaction: discord.Interaction,
-    button: discord.ui.Button,
-):
-    await self.cog.close_ticket(interaction)
+    async def close_ticket(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ):
+        await self.cog.close_ticket(interaction)
 
 
 class Tickets(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
+        self.bot = bot
         self.bot = bot
         self.bot.add_view(OpenTicketView(self))
         self.bot.add_view(TicketControls(self))
