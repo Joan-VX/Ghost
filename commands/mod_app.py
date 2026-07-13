@@ -6,7 +6,7 @@ import asyncio
 # ==========================================
 # CONFIGURATION
 # ==========================================
-TOKEN = "MTUyNTE5MzA1NjU1MzI3NTQ2Mg.GKIkJ_.vH6PbxIcnuxWMf0V3vlqFnCVFdhQ53LQNDtCsg"
+TOKEN = "DISCORD_TOKEN"
 LOG_CHANNEL_ID = 987654321098765432  # Private channel where staff reviews apps
 
 
