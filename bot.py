@@ -24,16 +24,20 @@ class MyBot(commands.Bot):
 
     async def setup_hook(self):
         # Load all command files from the commands folder
-        for filename in os.listdir("./commands"):
-            if filename.endswith(".py"):
-                extension = f"commands.{filename[:-3]}"
+for filename in os.listdir("./commands"):
+    if filename.endswith(".py"):
+        # Skip tickets.py
+        if filename == "tickets.py":
+            print("⏭️ Skipped commands.tickets")
+            continue
 
-                try:
-                    await self.load_extension(extension)
-                    print(f"✅ Loaded {extension}")
-                except Exception as e:
-                    print(f"❌ Failed to load {extension}: {e}")
+        extension = f"commands.{filename[:-3]}"
 
+        try:
+            await self.load_extension(extension)
+            print(f"✅ Loaded {extension}")
+        except Exception as e:
+            print(f"❌ Failed to load {extension}: {e}")
         # Sync slash commands
         try:
             synced = await self.tree.sync()
