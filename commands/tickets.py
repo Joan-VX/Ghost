@@ -419,17 +419,12 @@ class Tickets(commands.Cog):
             )
             return
 
-        await interaction.response.send_message(
-            "Closing ticket...",
-            ephemeral=True,
-        )
-
-        await self.log_ticket_close(channel, member)
+         await self.log_ticket_close(channel, member)
 
         await asyncio.sleep(2)
 
         await channel.delete(reason=f"Closed by {member}")
-          def get_ticket_owner_id(
+    def get_ticket_owner_id(
         self,
         channel: discord.TextChannel,
     ) -> Optional[int]:
@@ -441,14 +436,6 @@ class Tickets(commands.Cog):
             return int(match.group(1))
 
         return None
-
-    async def ensure_staff(
-        self,
-        ctx_or_interaction,
-    ) -> bool:
-        if isinstance(ctx_or_interaction, commands.Context):
-            member = ctx_or_interaction.author
-
             if not isinstance(member, discord.Member) or not is_staff(member):
                 await ctx_or_interaction.send(
                     "You do not have permission to use this command."
