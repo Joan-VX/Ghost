@@ -6,8 +6,8 @@ import asyncio
 # ==========================================
 # CONFIGURATION
 # ==========================================
-TOKEN = "DISCORD_TOKEN"
-LOG_CHANNEL_ID = 987654321098765432  # Private channel where staff reviews apps
+TOKEN = "YOUR_ACTUAL_BOT_TOKEN_HERE"
+LOG_CHANNEL_ID = 1525185798515724399  # Your review channel ID
 
 
 class ApplicationLauncher(discord.ui.View):
@@ -135,13 +135,27 @@ bot = ApplicationBot()
 @bot.event
 async def on_ready():
     print(f"🎯 Bot logged in as {bot.user.name}")
-    try:
-        synced = await bot.tree.sync()
-        print(f"Successfully synced {len(synced)} slash commands globally.")
-    except Exception as e:
-        print(f"Failed to sync commands: {e}")
+    print("Type '-sync' in your server to instantly load slash commands!")
 
 
+# ==========================================
+# TEXT COMMAND: INSTANT SYNC
+# ==========================================
+@bot.command(name="sync")
+@commands.has_permissions(administrator=True)
+async def sync(ctx: commands.Context):
+    """
+    Type -sync in your server. It bypasses Discord's 1-hour wait 
+    and forces all slash commands to appear immediately.
+    """
+    bot.tree.copy_global_to(guild=ctx.guild)
+    synced = await bot.tree.sync(guild=ctx.guild)
+    await ctx.send(f"✅ Instant Sync: Successfully loaded {len(synced)} slash commands to this server!")
+
+
+# ==========================================
+# SLASH COMMAND: SETUP BUTTON
+# ==========================================
 @bot.tree.command(name="setup_app", description="Spawn the persistent 'Apply for Staff' UI panel.")
 @app_commands.checks.has_permissions(administrator=True)
 async def setup_app(interaction: discord.Interaction):
