@@ -68,5 +68,7 @@ async def on_command_error(ctx, error):
     else:
         raise error
 
+if not TOKEN:
+    raise RuntimeError("DISCORD_TOKEN environment variable is not set.")
 
 bot.run(TOKEN)
