@@ -264,7 +264,7 @@ class Tickets(commands.Cog):
             f"Your ticket has been created: {channel.mention}",
             ephemeral=True,
         )
-          async def build_transcript(
+    async def build_transcript(
         self,
         channel: discord.TextChannel,
     ) -> discord.File:
