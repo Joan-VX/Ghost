@@ -4,7 +4,6 @@ from discord.ext import commands
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-# Staff roles
 STAFF_ROLES = {
     1524505452526833815,
     1524505551596290078,
@@ -23,10 +22,15 @@ class MyBot(commands.Bot):
         )
 
     async def setup_hook(self):
-        # Load all command files from the commands folder
+        print("🔄 Loading commands...")
+
+        if not os.path.exists("./commands"):
+            print("❌ commands folder not found")
+            return
+
         for filename in os.listdir("./commands"):
-            if filename.endswith(".py"):
-                # Skip tickets.py
+            if filename.endswith(".py") and filename != "__init__.py":
+
                 if filename == "tickets.py":
                     print("⏭️ Skipped commands.tickets")
                     continue
@@ -39,7 +43,6 @@ class MyBot(commands.Bot):
                 except Exception as e:
                     print(f"❌ Failed to load {extension}: {e}")
 
-        # Sync slash commands
         try:
             synced = await self.tree.sync()
             print(f"✅ Synced {len(synced)} slash commands.")
@@ -76,5 +79,6 @@ async def on_command_error(ctx, error):
 
 if not TOKEN:
     raise RuntimeError("DISCORD_TOKEN environment variable is not set.")
+
 
 bot.run(TOKEN)
