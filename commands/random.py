@@ -50,3 +50,5 @@ async def ping(ctx):
 
 if __name__ == "__main__":
     bot.run(TOKEN)
+    async def setup(bot):
+    await bot.add_cog(Random(bot))
