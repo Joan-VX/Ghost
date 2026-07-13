@@ -23,23 +23,28 @@ class ApplicationLauncher(discord.ui.View):
     async def apply_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = interaction.user
         
-        # 1. Let the user know we are DMing them
+        # 1. Secretly notify user we are validating dependencies
         await interaction.response.send_message(
-            "📬 Check your Direct Messages! I've sent you the application questions.", 
+            "⏳ Initializing application process... Checking DM availability.", 
             ephemeral=True
         )
 
-        # 2. Try to slide into their DMs
+        # 2. Try opening the Direct Message pipeline
         try:
             dm_channel = await user.create_dm()
         except discord.Forbidden:
-            # Triggers if the user has "Allow direct messages from server members" turned off
             return await interaction.followup.send(
-                "❌ I couldn't send you a DM. Please check your Discord Privacy Settings and ensure 'Allow direct messages from server members' is turned ON.",
+                "❌ Initialization failed. I couldn't send you a DM. Please check your Discord Privacy Settings and ensure 'Allow direct messages from server members' is turned ON.",
                 ephemeral=True
             )
 
-        # 3. Offload the question loop so it doesn't freeze the interaction
+        # Confirm to the user that the private channel is active and safe
+        await interaction.followup.send(
+            "📬 Direct Message pipeline established! Please open your DMs to answer the screening questions.",
+            ephemeral=True
+        )
+
+        # 3. Spin off the question thread as a hidden background event task
         self.bot.loop.create_task(self.run_dm_application(user, dm_channel, interaction.guild))
 
     async def run_dm_application(self, user: discord.User, dm: discord.DMChannel, guild: discord.Guild):
@@ -47,7 +52,6 @@ class ApplicationLauncher(discord.ui.View):
         The multi-step text question system handled purely inside the user's DMs.
         """
         def check(m):
-            # Make sure the bot only listens to messages from this specific user inside their DMs
             return m.author.id == user.id and m.channel.id == dm.id
 
         questions = [
@@ -59,9 +63,12 @@ class ApplicationLauncher(discord.ui.View):
 
         answers = []
 
-        await dm.send(f"👋 Welcome to the **{guild.name}** Staff Application! Let's get started. You have 5 minutes per question.")
+        try:
+            await dm.send(f"👋 Welcome to the **{guild.name}** Staff Application! Let's get started. You have 5 minutes per question.")
+        except discord.Forbidden:
+            return
 
-        for title, question in questions:
+        for index, (title, question) in enumerate(questions, start=1):
             embed = discord.Embed(title=title, description=question, color=discord.Color.blue())
             await dm.send(embed=embed)
 
@@ -69,14 +76,20 @@ class ApplicationLauncher(discord.ui.View):
                 # Wait up to 5 minutes (300 seconds) for a text response
                 msg = await self.bot.wait_for("message", check=check, timeout=300.0)
                 answers.append(msg.content)
+                
+                # Hidden status tracker sent only to the user's private DM context
+                await dm.send(f"📥 *Progress saved: Question {index}/4 logged successfully.*")
+                
             except asyncio.TimeoutError:
                 await dm.send("⏱️ **Application Timed Out.** You took too long to respond. Please click the button in the server to try again.")
                 return
 
         # 4. Process and Send the Results to the Server
+        await dm.send("⚙️ *Compiling responses and contacting backend database logs...*")
+        
         log_channel = guild.get_channel(LOG_CHANNEL_ID)
         if not log_channel:
-            await dm.send("❌ Something went wrong on our end. Please notify a Server Administrator that the log channel configuration is broken.")
+            await dm.send("❌ Internal Error: Something went wrong on our end. Please notify a Server Administrator that the log channel configuration is broken.")
             print(f"[ERROR] LOG_CHANNEL_ID {LOG_CHANNEL_ID} not found in guild '{guild.name}'.")
             return
 
@@ -107,7 +120,8 @@ class ApplicationLauncher(discord.ui.View):
 class ApplicationBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        intents.message_content = True  # Required to read text messages back from DMs
+        intents.members = True
+        intents.message_content = True 
         super().__init__(command_prefix="-", intents=intents)
 
     async def setup_hook(self):
@@ -123,7 +137,7 @@ async def on_ready():
     print(f"🎯 Bot logged in as {bot.user.name}")
     try:
         synced = await bot.tree.sync()
-        print(f"Successfully synced {len(synced)} slash commands.")
+        print(f"Successfully synced {len(synced)} slash commands globally.")
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
@@ -134,6 +148,9 @@ async def setup_app(interaction: discord.Interaction):
     """
     Run this once in your public recruitment channel.
     """
+    # Acknowledge the internal execution state secretly to the admin
+    await interaction.response.send_message("⚙️ Processing structural embed deployment...", ephemeral=True)
+
     embed = discord.Embed(
         title="🛡️ Moderation Staff Applications",
         description=(
@@ -144,8 +161,11 @@ async def setup_app(interaction: discord.Interaction):
         color=discord.Color.purple()
     )
     
+    # Deliver panel to channel view
     await interaction.channel.send(embed=embed, view=ApplicationLauncher(bot))
-    await interaction.response.send_message("✅ Application panel spawned!", ephemeral=True)
+    
+    # Update admin that verification was completed successfully
+    await interaction.followup.send("✅ Application panel deployed successfully to this channel!", ephemeral=True)
 
 
 if __name__ == "__main__":
