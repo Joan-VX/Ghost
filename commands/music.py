@@ -894,15 +894,14 @@ class Music(commands.Cog):
                 "Invalid queue position."
             )
 
-
-    @commands.command(
-        name="clear"
-    )
-    async def clear(
-        self,
-        ctx: commands.Context
-    ):
-
+@commands.command(
+    name="clearqueue",
+    aliases=["cq"]
+)
+async def clearqueue(
+    self,
+    ctx: commands.Context
+):
         data = self.get_guild_data(
             ctx.guild.id
         )
